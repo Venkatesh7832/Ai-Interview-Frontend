@@ -8,15 +8,28 @@ import NotFound       from './pages/NotFound'
 import ProtectedRoute from './components/ProtectedRoute'
 
 export default function App() {
+
+  const token = localStorage.getItem("interviewai_token");
+  
   return (
     <BrowserRouter>
       <Routes>
-        {/* Default → /login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* Public */}
-        <Route path="/login"    element={<Login />} />
+
+        {/* ✅ DEFAULT ROUTE */}
+        <Route
+          path="/"
+          element={token ? <Dashboard /> : <Navigate to="/login" />}
+        />
+
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* ✅ PROTECTED DASHBOARD */}
+        <Route
+          path="/dashboard"
+          element={token ? <Dashboard /> : <Navigate to="/login" />}
+        />
 
         {/* Protected */}
         <Route path="/dashboard"    element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -30,3 +43,5 @@ export default function App() {
     </BrowserRouter>
   )
 }
+
+

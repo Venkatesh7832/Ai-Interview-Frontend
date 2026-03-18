@@ -41,6 +41,8 @@ export default function Register() {
     }
   }
 
+
+  //** navigate("/dashboard")  */
   return (
     <div className="auth-layout">
       <div className="auth-left">
