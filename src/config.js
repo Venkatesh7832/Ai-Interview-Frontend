@@ -1,7 +1,18 @@
+
+// const config = {
+//   API_BASE_URL: "https://ai-interview-backend-1-js9a.onrender.com/api",
+//   TOKEN_KEY: "interviewai_token",
+//   USER_KEY: "interviewai_user",
+// }
+
+// export default config
+
+
+
 // Central configuration — all API calls go through this base URL.
 // Vite's proxy forwards /api/* → https://ai-interview-backend.onrender.com/api/*
 
-export const API_BASE_URL = 'https://ai-interview-backend-1-js9a.onrender.com'
+export const API_BASE_URL = 'https://ai-interview-backend-1-js9a.onrender.com/api'
 
 
 export const ENDPOINTS = {
@@ -28,5 +39,4 @@ export const ENDPOINTS = {
 
 export const TOKEN_KEY = 'ai_interview_token'
 export const USER_KEY  = 'ai_interview_user'
-
 
