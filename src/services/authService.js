@@ -1,61 +1,48 @@
-import API  from './api'
+import api from './api'
+import { saveToken, clearAuth } from '../utils/auth'
 
-const TOKEN_KEY = "interviewai_token"
-
-// ✅ REGISTER
+// REGISTER
 export const register = async ({ name, email, password }) => {
-  const res = await API.post("/auth/register", {
+  const res = await api.post("/auth/register", {
     name,
     email,
     password
   })
 
-  // If backend returns token after register
   if (res.data.token) {
-    localStorage.setItem(TOKEN_KEY, res.data.token)
+    saveToken(res.data.token)
   }
 
   return res.data
 }
 
-
-// ✅ LOGIN
+// LOGIN
 export const login = async ({ email, password }) => {
-  const res = await API.post("/auth/login", {
+  const res = await api.post("/auth/login", {
     email,
     password
   })
 
-  const token = res.data.token
-
-  if (token) {
-    localStorage.setItem(TOKEN_KEY, token)   // ✅ FIXED
+  if (res.data.token) {
+    saveToken(res.data.token)
   }
 
   return res.data
 }
 
-
-// ✅ AXIOS INTERCEPTOR (attach token)
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem(TOKEN_KEY)
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-
-  return config
-})
-
-// ✅ LOGOUT
+// LOGOUT
 export const logout = async () => {
-  await API.post("/auth/logout")
-  localStorage.removeItem(TOKEN_KEY)
+  try {
+    await api.post("/auth/logout") // optional (if backend supports)
+  } catch (e) {
+    console.warn("Logout API failed, continuing...")
+  }
+
+  clearAuth() // ✅ unified cleanup
 }
 
-// ✅ GET CURRENT USER
+// GET CURRENT USER
 export const getCurrentUser = async () => {
-  const res = await API.get("/auth/user")
+  const res = await api.get("/auth/user")
   return res.data
 }
-

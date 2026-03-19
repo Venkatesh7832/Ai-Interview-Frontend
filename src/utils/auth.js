@@ -1,54 +1,62 @@
-import api from './api'
-import { saveToken } from '../utils/auth'
+import { TOKEN_KEY, USER_KEY } from '../config'
 
-// REGISTER
-export const register = async ({ name, email, password }) => {
-  const res = await api.post("/auth/register", {
-    name,
-    email,
-    password
-  })
+// ==================== TOKEN ====================
 
-  if (res.data.token) {
-    saveToken(res.data.token)   // ✅ FIXED
-  }
-
-  return res.data
-}
-
-// LOGIN
-export const login = async ({ email, password }) => {
-  const res = await api.post("/auth/login", {
-    email,
-    password
-  })
-
-  if (res.data.token) {
-    saveToken(res.data.token)   // ✅ FIXED
-  }
-
-  return res.data
-}
-
-// auth check interceptor
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("interviewai_token")
-
+// Save token
+export const saveToken = (token) => {
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+    localStorage.setItem(TOKEN_KEY, token)
   }
-
-  return config
-})
-
-// LOGOUT
-export const logout = async () => {
-  await api.post("/auth/logout")
-  localStorage.removeItem("interviewai_token")
 }
 
-// GET CURRENT USER
-export const getCurrentUser = async () => {
-  const res = await api.get("/auth/user")
-  return res.data
-} 
+// Get token
+export const getToken = () => {
+  return localStorage.getItem(TOKEN_KEY)
+}
+
+// Remove token
+export const removeToken = () => {
+  localStorage.removeItem(TOKEN_KEY)
+}
+
+
+// ==================== USER ====================
+
+// Save user (optional)
+export const saveUser = (user) => {
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user))
+  }
+}
+
+// Get user
+export const getUser = () => {
+  try {
+    const data = localStorage.getItem(USER_KEY)
+    return data ? JSON.parse(data) : null
+  } catch {
+    return null
+  }
+}
+
+// Remove user
+export const removeUser = () => {
+  localStorage.removeItem(USER_KEY)
+}
+
+
+// ==================== AUTH ====================
+
+// Check login
+export const isAuthenticated = () => {
+  return !!getToken()
+}
+
+
+// ==================== LOGOUT ====================
+
+// Local logout only (fast + safe)
+export const clearAuth = () => {
+  removeToken()
+  removeUser()
+}
