@@ -1,9 +1,9 @@
 import axios from 'axios'
 import { API_BASE_URL } from '../config'
-import { getToken, logout } from '../utils/auth'
+import { getToken, clearAuth } from '../utils/auth'
 
 const api = axios.create({
-  baseURL: API_BASE_URL,   // ✅ dynamic (correct)
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   },
@@ -22,12 +22,12 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
-// ✅ Handle unauthorized
+// ✅ Handle 401 globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      logout()
+      clearAuth()  // ✅ FIXED
       window.location.href = '/login'
     }
     return Promise.reject(error)

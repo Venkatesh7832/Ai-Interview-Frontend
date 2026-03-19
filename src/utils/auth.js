@@ -1,35 +1,23 @@
 import { TOKEN_KEY, USER_KEY } from '../config'
 
-// ==================== TOKEN ====================
-
-// Save token
+// TOKEN
 export const saveToken = (token) => {
-  if (token) {
-    localStorage.setItem(TOKEN_KEY, token)
-  }
+  if (token) localStorage.setItem(TOKEN_KEY, token)
 }
 
-// Get token
 export const getToken = () => {
   return localStorage.getItem(TOKEN_KEY)
 }
 
-// Remove token
 export const removeToken = () => {
   localStorage.removeItem(TOKEN_KEY)
 }
 
-
-// ==================== USER ====================
-
-// Save user (optional)
+// USER
 export const saveUser = (user) => {
-  if (user) {
-    localStorage.setItem(USER_KEY, JSON.stringify(user))
-  }
+  if (user) localStorage.setItem(USER_KEY, JSON.stringify(user))
 }
 
-// Get user
 export const getUser = () => {
   try {
     const data = localStorage.getItem(USER_KEY)
@@ -39,23 +27,14 @@ export const getUser = () => {
   }
 }
 
-// Remove user
 export const removeUser = () => {
   localStorage.removeItem(USER_KEY)
 }
 
+// AUTH
+export const isAuthenticated = () => !!getToken()
 
-// ==================== AUTH ====================
-
-// Check login
-export const isAuthenticated = () => {
-  return !!getToken()
-}
-
-
-// ==================== LOGOUT ====================
-
-// Local logout only (fast + safe)
+// ✅ IMPORTANT: renamed logout → clearAuth
 export const clearAuth = () => {
   removeToken()
   removeUser()

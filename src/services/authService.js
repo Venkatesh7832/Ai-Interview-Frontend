@@ -33,15 +33,15 @@ export const login = async ({ email, password }) => {
 // LOGOUT
 export const logout = async () => {
   try {
-    await api.post("/auth/logout") // optional (if backend supports)
+    await api.post("/auth/logout")
   } catch (e) {
-    console.warn("Logout API failed, continuing...")
+    console.warn("Logout API failed")
   }
 
-  clearAuth() // ✅ unified cleanup
+  clearAuth()
 }
 
-// GET CURRENT USER
+// GET USER
 export const getCurrentUser = async () => {
   const res = await api.get("/auth/user")
   return res.data
