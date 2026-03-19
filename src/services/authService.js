@@ -1,23 +1,27 @@
-import api from './api'
-import { ENDPOINTS } from '../config'
-import { saveToken, saveUser } from '../utils/auth'
+import API  from './api'
 
-/**
- * POST /api/auth/login
- * Returns { token, tokenType, userId, name, email, role }
- */
+const TOKEN_KEY = "interviewai_token"
 
+// ✅ REGISTER
 export const register = async ({ name, email, password }) => {
-  const res = await api.post("/auth/register", {
+  const res = await API.post("/auth/register", {
     name,
     email,
     password
   })
+
+  // If backend returns token after register
+  if (res.data.token) {
+    localStorage.setItem(TOKEN_KEY, res.data.token)
+  }
+
   return res.data
 }
 
+
+// ✅ LOGIN
 export const login = async ({ email, password }) => {
-  const res = await api.post("/auth/login", {
+  const res = await API.post("/auth/login", {
     email,
     password
   })
@@ -25,15 +29,16 @@ export const login = async ({ email, password }) => {
   const token = res.data.token
 
   if (token) {
-    localStorage.setItem(config.TOKEN_KEY, token)
+    localStorage.setItem(TOKEN_KEY, token)   // ✅ FIXED
   }
 
   return res.data
 }
 
-api.interceptors.request.use((config) => {
 
-  const token = localStorage.getItem("interviewai_token")
+// ✅ AXIOS INTERCEPTOR (attach token)
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem(TOKEN_KEY)
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
@@ -42,21 +47,15 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// ✅ LOGOUT
+export const logout = async () => {
+  await API.post("/auth/logout")
+  localStorage.removeItem(TOKEN_KEY)
+}
 
-// export const login = async (email, password) => {
-//   const { data } = await api.post(ENDPOINTS.LOGIN, { email, password })
-//   saveToken(data.token)
-//   saveUser({ userId: data.userId, name: data.name, email: data.email, role: data.role })
-//   return data
-// }
+// ✅ GET CURRENT USER
+export const getCurrentUser = async () => {
+  const res = await API.get("/auth/user")
+  return res.data
+}
 
-// /**
-//  * POST /api/auth/register
-//  * Returns same shape as login
-//  */
-// export const register = async (name, email, password) => {
-//   const { data } = await api.post(ENDPOINTS.REGISTER, { name, email, password })
-//   saveToken(data.token)
-//   saveUser({ userId: data.userId, name: data.name, email: data.email, role: data.role })
-//   return data
-// }

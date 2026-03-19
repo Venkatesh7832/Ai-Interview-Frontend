@@ -3,11 +3,14 @@ import { API_BASE_URL } from '../config'
 import { getToken, logout } from '../utils/auth'
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: { 'Content-Type': 'application/json' },
+  baseURL: API_BASE_URL,   // ✅ dynamic (correct)
+  headers: {
+    'Content-Type': 'application/json'
+  },
   timeout: 15000,
 })
 
+// ✅ Attach token
 api.interceptors.request.use(
   (config) => {
     const token = getToken()
@@ -15,9 +18,11 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
-  }
+  },
+  (error) => Promise.reject(error)
 )
 
+// ✅ Handle unauthorized
 api.interceptors.response.use(
   (response) => response,
   (error) => {

@@ -1,22 +1,54 @@
-import { TOKEN_KEY, USER_KEY } from '../config'
+import api from './api'
+import { saveToken } from '../utils/auth'
 
-export const saveToken = (token) => localStorage.setItem(TOKEN_KEY, token)
-export const getToken  = ()      => localStorage.getItem(TOKEN_KEY)
-export const removeToken = ()    => localStorage.removeItem(TOKEN_KEY)
+// REGISTER
+export const register = async ({ name, email, password }) => {
+  const res = await api.post("/auth/register", {
+    name,
+    email,
+    password
+  })
 
-export const saveUser = (user) => localStorage.setItem(USER_KEY, JSON.stringify(user))
-export const getUser  = ()     => {
-  try {
-    return JSON.parse(localStorage.getItem(USER_KEY))
-  } catch {
-    return null
+  if (res.data.token) {
+    saveToken(res.data.token)   // ✅ FIXED
   }
-}
-export const removeUser = () => localStorage.removeItem(USER_KEY)
 
-export const isAuthenticated = () => !!getToken()
-
-export const logout = () => {
-  removeToken()
-  removeUser()
+  return res.data
 }
+
+// LOGIN
+export const login = async ({ email, password }) => {
+  const res = await api.post("/auth/login", {
+    email,
+    password
+  })
+
+  if (res.data.token) {
+    saveToken(res.data.token)   // ✅ FIXED
+  }
+
+  return res.data
+}
+
+// auth check interceptor
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("interviewai_token")
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+
+  return config
+})
+
+// LOGOUT
+export const logout = async () => {
+  await api.post("/auth/logout")
+  localStorage.removeItem("interviewai_token")
+}
+
+// GET CURRENT USER
+export const getCurrentUser = async () => {
+  const res = await api.get("/auth/user")
+  return res.data
+} 

@@ -18,12 +18,23 @@ export default function Login() {
     e.preventDefault()
     setError('')
     setLoading(true)
+
     try {
-      await login(form.email, form.password)
+      const res = await login(form)   // ✅ FIXED
+
+      localStorage.setItem("interviewai_token", res.data.token)
+
       navigate(from, { replace: true })
+
     } catch (err) {
-      const msg = err.response?.data?.message || 'Invalid email or password.'
-      setError(msg)
+      console.error(err)
+
+      if (err.response?.status === 401) {
+        setError("Invalid email or password")
+      } else {
+        setError(err.response?.data?.message || "Something went wrong")
+      }
+
     } finally {
       setLoading(false)
     }
@@ -36,59 +47,41 @@ export default function Login() {
           <div className="auth-logo">◈ InterviewAI</div>
           <h1 className="auth-headline">Ace your next<br/>technical interview.</h1>
           <p className="auth-sub">AI-powered question sessions with real-time feedback and scoring.</p>
-          <div className="auth-stats">
-            <div className="stat"><span className="stat-n">16+</span><span className="stat-l">Questions</span></div>
-            <div className="stat"><span className="stat-n">AI</span><span className="stat-l">Feedback</span></div>
-            <div className="stat"><span className="stat-n">∞</span><span className="stat-l">Practice</span></div>
-          </div>
         </div>
-        <div className="auth-bg-grid" aria-hidden="true" />
       </div>
 
       <div className="auth-right">
         <div className="auth-card">
           <h2 className="auth-card-title">Welcome back</h2>
-          <p className="auth-card-sub">Sign in to continue your practice</p>
 
           {error && <div className="alert alert-error">{error}</div>}
 
-          <form onSubmit={handleSubmit} className="auth-form" noValidate>
-            <div className="field">
-              <label htmlFor="email">Email</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
+          <form onSubmit={handleSubmit} className="auth-form">
 
-            <div className="field">
-              <label htmlFor="password">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            <input
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="Email"
+              required
+            />
 
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? <span className="spinner" /> : 'Sign in'}
+            <input
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Password"
+              required
+            />
+
+            <button type="submit" disabled={loading}>
+              {loading ? "Loading..." : "Login"}
             </button>
+
           </form>
 
-          <p className="auth-switch">
-            Don't have an account? <Link to="/register">Create one</Link>
-          </p>
+          <Link to="/register">Create account</Link>
         </div>
       </div>
     </div>
